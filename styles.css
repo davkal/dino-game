@@ -1,0 +1,94 @@
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+    Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+  /* background-image: url("images/landscape.jpg"); */
+  background-size: cover;
+}
+
+.target,
+.attacker {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  left: 0px;
+  top: 0px;
+  border: 1px solid brown;
+  border-radius: 20%;
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+  box-shadow: 2px 5px 10px 0px rgba(0, 0, 0, 0.5);
+  background-color: rgba(255, 255, 255, 0.25);
+}
+
+.target {
+  /* background-image: url("images/target1.png"); */
+  animation-duration: 3s;
+  animation-name: wiggle;
+  animation-iteration-count: infinite;
+  animation-timing-function: cubic-bezier(0.3, 0.1, 0.2, 1);
+  animation-delay: 5s;
+  transform: translate3d(0, 0, 0);
+}
+
+.attacker {
+  transition: transform 500ms;
+  background-color: darkviolet;
+  /* background-image: url("images/attacker1.png"); */
+}
+
+.letter {
+  text-align: center;
+  width: 1.25em;
+  height: 1.25em;
+  top: 60%;
+  left: 50%;
+  font-size: 1.75em;
+  padding-top: 0.05em;
+  background-color: darkslategray;
+  border-radius: 12%;
+  color: white;
+  position: relative;
+  text-shadow: black;
+  display: inline-block;
+}
+
+.title {
+  position: absolute;
+  top: 30%;
+  text-align: center;
+  z-index: 1000;
+  width: 100%;
+  font-family: "Freckle Face", cursive;
+}
+
+.headline {
+  font-size: 5rem;
+}
+
+.hidden {
+  display: none;
+}
+
+@keyframes wiggle {
+  20%,
+  80% {
+    transform: translate3d(0, 0, 0);
+  }
+
+  30%,
+  70% {
+    transform: translate3d(4px, 2px, 0);
+  }
+
+  40%,
+  50%,
+  60% {
+    transform: translate3d(-8px, 0, 0);
+  }
+
+  45%,
+  55% {
+    transform: translate3d(8px, -2px, 0);
+  }
+}
