@@ -2,7 +2,6 @@
 
 /**
  * TODOS
- * - feedback for typed letter
  * - multiple letters after a while
  * - show/change speed
  * - more attackers
@@ -104,17 +103,19 @@ function render() {
           .classed("letter", true)
           .text((d) => d.letter),
       (update) =>
-        update.style("transform", (d) => {
-          const x = d.erased
-            ? -2 * attackerRadius
-            : distanceX(d.distance) - 2 * attackerRadius;
-          const y = d.erased
-            ? d.startY
-            : distanceY.range([d.startY, targetCenterY - attackerRadius])(
-                d.distance
-              );
-          return `translate(${x}px,${y}px)`;
-        })
+        update
+          .classed("erased", (d) => d.erased)
+          .style("transform", (d) => {
+            const x = d.erased
+              ? -2 * attackerRadius
+              : distanceX(d.distance) - 2 * attackerRadius;
+            const y = d.erased
+              ? d.startY
+              : distanceY.range([d.startY, targetCenterY - attackerRadius])(
+                  d.distance
+                );
+            return `translate(${x}px,${y}px)`;
+          })
     );
 }
 
@@ -191,6 +192,7 @@ function handleKey(e) {
   for (const attacker of attackers) {
     if (attacker.letter === e.key.toUpperCase()) {
       attacker.erased = true;
+      render();
       setTimeout(() => {
         attackers = attackers.filter((a) => !a.erased);
       }, 1000);

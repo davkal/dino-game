@@ -28,7 +28,6 @@ footer {
   background-image: url("images/target1.png");
   animation-duration: 3s;
   animation-name: wiggle;
-  animation-iteration-count: infinite;
   animation-timing-function: cubic-bezier(0.3, 0.1, 0.2, 1);
   animation-delay: 5s;
   transform: translate3d(0, 0, 0);
@@ -53,6 +52,10 @@ footer {
   position: relative;
   text-shadow: black;
   display: inline-block;
+}
+
+.attacker.erased .letter {
+  background-color: maroon;
 }
 
 .title {
