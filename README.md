@@ -12,7 +12,6 @@ It's based on simple mechanics and can be themed differently by replacing the im
 
 ## TODO
 
-- [ ] scene resize
 - [ ] feedback for typed letter
 - [ ] multiple letters after a while
 - [ ] show/change speed

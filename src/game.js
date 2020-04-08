@@ -2,26 +2,12 @@
 
 /**
  * TODOS
- * - scene resize
  * - feedback for typed letter
  * - multiple letters after a while
  * - show/change speed
  * - more attackers
  * - more targets
  */
-
-const sceneWidth = window.innerWidth;
-const sceneHeight = window.innerHeight;
-const unit = sceneWidth / 100;
-const margin = 3 * unit;
-
-const targetRadius = 8 * unit;
-const targetCenterX = sceneWidth - margin - targetRadius;
-const targetCenterY = sceneHeight / 2;
-
-const attackerRadius = 8 * unit;
-const attackerCenterX = 0 + margin + attackerRadius;
-const attackerCenterY = sceneHeight / 3;
 
 const MAX_STEPS = 60;
 const speed = 6;
@@ -30,12 +16,45 @@ const steps = Math.floor(MAX_STEPS / speed);
 const soundGameOver = new Audio("audio/gameover.mp3");
 const soundDanger = new Audio("audio/danger.mp3");
 
-const distanceX = d3
-  .scaleLinear()
-  .domain([steps, 0])
-  .range([-attackerRadius, targetCenterX]);
+let sceneWidth;
+let sceneHeight;
+let unit;
+let margin;
+
+let targetRadius;
+let targetCenterX;
+let targetCenterY;
+
+let attackerRadius;
+let attackerCenterX;
+let attackerCenterY;
+
+let distanceX;
+let distanceY;
 let attackers = [];
 let control;
+
+function setDimensions() {
+  sceneWidth = window.innerWidth;
+  sceneHeight = window.innerHeight;
+  unit = sceneWidth / 100;
+  margin = 3 * unit;
+
+  targetRadius = 8 * unit;
+  targetCenterX = sceneWidth - margin - targetRadius;
+  targetCenterY = sceneHeight / 2;
+
+  attackerRadius = 8 * unit;
+  attackerCenterX = 0 + margin + attackerRadius;
+  attackerCenterY = sceneHeight / 3;
+
+  distanceX = d3
+    .scaleLinear()
+    .domain([steps, 0])
+    .range([-attackerRadius, targetCenterX]);
+
+  distanceY = d3.scaleLinear().domain([steps, 0]);
+}
 
 function getNextLetter() {
   const index = Math.floor(Math.random() * 26);
@@ -75,7 +94,11 @@ function render() {
           const x = d.erased
             ? -2 * attackerRadius
             : distanceX(d.distance) - 2 * attackerRadius;
-          const y = d.erased ? d.startY : d.yScale(d.distance);
+          const y = d.erased
+            ? d.startY
+            : distanceY.range([d.startY, targetCenterY - attackerRadius])(
+                d.distance
+              );
           return `translate(${x}px,${y}px)`;
         })
     );
@@ -116,14 +139,11 @@ function createAttacker() {
     distance: steps,
     startX: 0,
     startY: y,
-    yScale: d3
-      .scaleLinear()
-      .domain([steps, 0])
-      .range([y, targetCenterY - attackerRadius]),
   };
 }
 
 function start() {
+  setDimensions();
   setScene();
   return d3.interval(loop, 1000);
 }
@@ -152,4 +172,10 @@ function handleKey(e) {
   }
 }
 
+function onResize() {
+  setDimensions();
+  setScene();
+}
+
 document.addEventListener("keydown", handleKey);
+window.addEventListener("resize", onResize);
