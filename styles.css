@@ -5,6 +5,13 @@ body {
   background-size: cover;
 }
 
+footer {
+  position: fixed;
+  bottom: 1em;
+  right: 1em;
+  opacity: 0.7;
+}
+
 .target,
 .attacker {
   position: absolute;
@@ -15,7 +22,6 @@ body {
   background-repeat: no-repeat;
   background-size: contain;
   background-position: center;
-  background-color: rgba(255, 255, 255, 0.25);
 }
 
 .target {

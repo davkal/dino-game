@@ -9,9 +9,10 @@
  * - more targets
  */
 
-const MAX_STEPS = 60;
-const speed = 6;
-const steps = Math.floor(MAX_STEPS / speed);
+const MAX_STEPS = 50;
+const DEFAULT_SPEED = 5;
+const MIN_SPEED = 1;
+const MAX_SPEED = 10;
 
 const soundGameOver = new Audio("audio/gameover.mp3");
 const soundDanger = new Audio("audio/danger.mp3");
@@ -29,10 +30,21 @@ let attackerRadius;
 let attackerCenterX;
 let attackerCenterY;
 
+let steps;
+let speed = DEFAULT_SPEED;
 let distanceX;
 let distanceY;
 let attackers = [];
 let control;
+
+function setSpeed(change) {
+  if (change) {
+    speed += change;
+    speed = Math.max(speed, MIN_SPEED);
+    speed = Math.min(speed, MAX_SPEED);
+  }
+  steps = Math.floor(MAX_STEPS / speed);
+}
 
 function setDimensions() {
   sceneWidth = window.innerWidth;
@@ -69,6 +81,8 @@ function setScene() {
     .style("top", targetCenterY - targetRadius)
     .style("width", targetRadius * 2)
     .style("height", targetRadius * 2);
+  d3.select("footer").classed("hidden", false);
+  d3.select("#tempo").text(speed);
 }
 
 function render() {
@@ -143,6 +157,7 @@ function createAttacker() {
 }
 
 function start() {
+  setSpeed();
   setDimensions();
   setScene();
   return d3.interval(loop, 1000);
@@ -152,6 +167,7 @@ function reset() {
   control = undefined;
   d3.select(".title").classed("hidden", false);
   d3.select(".target").classed("hidden", true);
+  d3.select("footer").classed("hidden", true);
   attackers = [];
   render();
 }
@@ -159,6 +175,16 @@ function reset() {
 function handleKey(e) {
   if (e.key === " " && !control) {
     control = start();
+    return;
+  }
+
+  if (e.key === "+") {
+    onChangeSpeed(1);
+    return;
+  }
+
+  if (e.key === "-") {
+    onChangeSpeed(-1);
     return;
   }
 
@@ -173,6 +199,12 @@ function handleKey(e) {
 }
 
 function onResize() {
+  setDimensions();
+  setScene();
+}
+
+function onChangeSpeed(change) {
+  setSpeed(change);
   setDimensions();
   setScene();
 }
