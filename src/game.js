@@ -1,5 +1,3 @@
-// ES2015
-
 /**
  * TODOS
  * - multiple letters after a while
@@ -8,33 +6,33 @@
  * - more targets
  */
 
-const MAX_STEPS = 50;
-const DEFAULT_SPEED = 5;
-const MIN_SPEED = 1;
-const MAX_SPEED = 10;
+var MAX_STEPS = 50;
+var DEFAULT_SPEED = 5;
+var MIN_SPEED = 1;
+var MAX_SPEED = 10;
 
-const soundGameOver = new Audio("audio/gameover.mp3");
-const soundDanger = new Audio("audio/danger.mp3");
+var soundGameOver = new Audio("audio/gameover.mp3");
+var soundDanger = new Audio("audio/danger.mp3");
 
-let sceneWidth;
-let sceneHeight;
-let unit;
-let margin;
+var sceneWidth;
+var sceneHeight;
+var unit;
+var margin;
 
-let targetRadius;
-let targetCenterX;
-let targetCenterY;
+var targetRadius;
+var targetCenterX;
+var targetCenterY;
 
-let attackerRadius;
-let attackerCenterX;
-let attackerCenterY;
+var attackerRadius;
+var attackerCenterX;
+var attackerCenterY;
 
-let steps;
-let speed = DEFAULT_SPEED;
-let distanceX;
-let distanceY;
-let attackers = [];
-let control;
+var steps;
+var speed = DEFAULT_SPEED;
+var distanceX;
+var distanceY;
+var attackers = [];
+var control;
 
 function setSpeed(change) {
   if (change) {
@@ -67,9 +65,8 @@ function setDimensions() {
   distanceY = d3.scaleLinear().domain([steps, 0]);
 }
 
-function getNextLetter() {
-  const index = Math.floor(Math.random() * 26);
-  return String.fromCharCode(65 + index);
+function getNextCharCode() {
+  return Math.floor(Math.random() * 26) + 65;
 }
 
 function setScene() {
@@ -87,25 +84,37 @@ function setScene() {
 function render() {
   d3.select(".attackers")
     .selectAll(".attacker")
-    .data(attackers, (d) => d.letter)
+    .data(attackers, function (d) {
+      return d.letter;
+    })
     .join(
-      (enter) =>
-        enter
+      function (enter) {
+        return enter
           .append("div")
           .classed("attacker", true)
           .style("width", attackerRadius * 2)
           .style("height", attackerRadius * 2)
-          .style(
-            "transform",
-            (d) => `translate(${-2 * attackerRadius}px,${d.startY}px)`
-          )
+          .style("transform", function (d) {
+            return [
+              "translate(",
+              -2 * attackerRadius,
+              "px,",
+              d.startY,
+              "px)",
+            ].join("");
+          })
           .append("span")
           .classed("letter", true)
-          .text((d) => d.letter),
-      (update) =>
-        update
-          .classed("erased", (d) => d.erased)
-          .style("transform", (d) => {
+          .text(function (d) {
+            return d.letter;
+          });
+      },
+      function (update) {
+        return update
+          .classed("erased", function (d) {
+            return d.erased;
+          })
+          .style("transform", function (d) {
             const x = d.erased
               ? -2 * attackerRadius
               : distanceX(d.distance) - 2 * attackerRadius;
@@ -114,14 +123,15 @@ function render() {
               : distanceY.range([d.startY, targetCenterY - attackerRadius])(
                   d.distance
                 );
-            return `translate(${x}px,${y}px)`;
-          })
+            return ["translate(", x, "px,", y, "px)"].join("");
+          });
+      }
     );
 }
 
 function loop(elapsed) {
   // modify state
-  for (const attacker of attackers) {
+  attackers.forEach(function (attacker) {
     attacker.distance = Math.max(attacker.distance - 1, 0);
     switch (attacker.distance) {
       case 0:
@@ -137,7 +147,7 @@ function loop(elapsed) {
       default:
         break;
     }
-  }
+  });
 
   if (attackers.length === 0) {
     attackers.push(createAttacker());
@@ -148,9 +158,11 @@ function loop(elapsed) {
 }
 
 function createAttacker() {
-  const y = Math.random() * sceneHeight;
+  var y = Math.random() * (sceneHeight - 2 * attackerRadius);
+  var charCode = getNextCharCode();
   return {
-    letter: getNextLetter(),
+    charCode: charCode,
+    letter: String.fromCharCode(charCode),
     distance: steps,
     startX: 0,
     startY: y,
@@ -174,30 +186,40 @@ function reset() {
 }
 
 function handleKey(e) {
-  if (e.key === " " && !control) {
+  // Using keyCode to support older computers
+  // console.log(e.keyCode);
+
+  // SPACE
+  if (e.keyCode === 32 && !control) {
     control = start();
     return;
   }
 
-  if (e.key === "+") {
+  // PLUS
+  if (e.keyCode === 187) {
     onChangeSpeed(1);
     return;
   }
 
-  if (e.key === "-") {
+  // MINUS
+  if (e.keyCode === 189) {
     onChangeSpeed(-1);
     return;
   }
 
-  for (const attacker of attackers) {
-    if (attacker.letter === e.key.toUpperCase()) {
+  attackers.forEach(function (attacker) {
+    if (attacker.charCode === e.keyCode) {
       attacker.erased = true;
       render();
-      setTimeout(() => {
-        attackers = attackers.filter((a) => !a.erased);
-      }, 1000);
+      setTimeout(removeErased, 1000);
     }
-  }
+  });
+}
+
+function removeErased() {
+  attackers = attackers.filter(function (a) {
+    return !a.erased;
+  });
 }
 
 function onResize() {
