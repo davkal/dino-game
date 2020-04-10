@@ -41,6 +41,7 @@ function setSpeed(change) {
     speed = Math.min(speed, MAX_SPEED);
   }
   steps = Math.floor(MAX_STEPS / speed);
+  d3.select("#tempo").text(speed);
 }
 
 function setDimensions() {
@@ -77,8 +78,6 @@ function setScene() {
     .style("top", targetCenterY - targetRadius)
     .style("width", targetRadius * 2)
     .style("height", targetRadius * 2);
-  d3.select("footer").classed("hidden", false);
-  d3.select("#tempo").text(speed);
 }
 
 function render() {
@@ -180,14 +179,13 @@ function reset() {
   control = undefined;
   d3.select(".title").classed("hidden", false);
   d3.select(".target").classed("hidden", true);
-  d3.select("footer").classed("hidden", true);
   attackers = [];
   render();
 }
 
 function handleKey(e) {
   // Using keyCode to support older computers
-  // console.log(e.keyCode);
+  console.log(e.keyCode);
 
   // SPACE
   if (e.keyCode === 32 && !control) {
@@ -196,13 +194,13 @@ function handleKey(e) {
   }
 
   // PLUS
-  if (e.keyCode === 187) {
+  if (e.keyCode === 187 || (!control && e.keyCode === 70)) {
     onChangeSpeed(1);
     return;
   }
 
   // MINUS
-  if (e.keyCode === 189) {
+  if (e.keyCode === 189 || (!control && e.keyCode === 83)) {
     onChangeSpeed(-1);
     return;
   }
@@ -229,9 +227,12 @@ function onResize() {
 
 function onChangeSpeed(change) {
   setSpeed(change);
-  setDimensions();
-  setScene();
+  if (control) {
+    setDimensions();
+    setScene();
+  }
 }
 
+onChangeSpeed();
 document.addEventListener("keydown", handleKey);
 window.addEventListener("resize", onResize);
