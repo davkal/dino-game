@@ -1,7 +1,5 @@
 /**
  * TODOS
- * - multiple letters after a while
- * - show/change speed
  * - more attackers
  * - more targets
  */
@@ -33,6 +31,9 @@ var distanceX;
 var distanceY;
 var attackers = [];
 var control;
+var attackerSize = 1;
+var attackerCount = 0;
+var attackersPerLevel = 5;
 
 function setSpeed(change) {
   if (change) {
@@ -67,7 +68,9 @@ function setDimensions() {
 }
 
 function getNextCharCode() {
-  return Math.floor(Math.random() * 26) + 65;
+  return d3
+    .shuffle("ABCDEFGHIJKLMNOPQRSTUVXYZ1234567890".split(""))[0]
+    .charCodeAt(0);
 }
 
 function setScene() {
@@ -78,6 +81,20 @@ function setScene() {
     .style("top", targetCenterY - targetRadius)
     .style("width", targetRadius * 2)
     .style("height", targetRadius * 2);
+}
+
+function renderLetters(attacker) {
+  d3.select(this)
+    .selectAll("span")
+    .data(attacker.letters)
+    .join("span")
+    .classed("letter", true)
+    .classed("typed", function (d) {
+      return d.typed;
+    })
+    .text(function (d) {
+      return d.letter;
+    });
 }
 
 function render() {
@@ -102,11 +119,7 @@ function render() {
               "px)",
             ].join("");
           })
-          .append("span")
-          .classed("letter", true)
-          .text(function (d) {
-            return d.letter;
-          });
+          .each(renderLetters);
       },
       function (update) {
         return update
@@ -123,7 +136,8 @@ function render() {
                   d.distance
                 );
             return ["translate(", x, "px,", y, "px)"].join("");
-          });
+          })
+          .each(renderLetters);
       }
     );
 }
@@ -149,19 +163,28 @@ function loop(elapsed) {
   });
 
   if (attackers.length === 0) {
-    attackers.push(createAttacker());
+    attackerCount++;
+    attackerSize = Math.ceil(attackerCount / attackersPerLevel);
+    attackers.push(createAttacker(attackerSize));
   }
 
   // render state
   render();
 }
 
-function createAttacker() {
+function createAttacker(size) {
   var y = Math.random() * (sceneHeight - 2 * attackerRadius);
-  var charCode = getNextCharCode();
+  var letters = [];
+  for (var i = 0; i < size; i++) {
+    var charCode = getNextCharCode();
+    letters.push({
+      charCode: charCode,
+      letter: String.fromCharCode(charCode),
+    });
+  }
   return {
-    charCode: charCode,
-    letter: String.fromCharCode(charCode),
+    letters: letters,
+    letterIndex: 0,
     distance: steps,
     startX: 0,
     startY: y,
@@ -206,8 +229,10 @@ function handleKey(e) {
   }
 
   attackers.forEach(function (attacker) {
-    if (attacker.charCode === e.keyCode) {
-      attacker.erased = true;
+    if (attacker.letters[attacker.letterIndex].charCode === e.keyCode) {
+      attacker.letters[attacker.letterIndex].typed = true;
+      attacker.letterIndex++;
+      attacker.erased = attacker.letterIndex === attacker.letters.length;
       render();
       setTimeout(removeErased, 1000);
     }

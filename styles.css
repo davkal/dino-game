@@ -54,7 +54,7 @@ footer {
   display: inline-block;
 }
 
-.attacker.erased .letter {
+.letter.typed {
   background-color: maroon;
 }
 
