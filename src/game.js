@@ -5,7 +5,7 @@
  */
 
 var MAX_STEPS = 50;
-var DEFAULT_SPEED = 5;
+var DEFAULT_SPEED = 3;
 var MIN_SPEED = 1;
 var MAX_SPEED = 10;
 
@@ -33,7 +33,7 @@ var attackers = [];
 var control;
 var attackerSize = 1;
 var attackerCount = 0;
-var attackersPerLevel = 5;
+var attackersPerLevel = 10;
 
 function setSpeed(change) {
   if (change) {
@@ -203,6 +203,7 @@ function reset() {
   d3.select(".title").classed("hidden", false);
   d3.select(".target").classed("hidden", true);
   attackers = [];
+  attackerSize = 1;
   render();
 }
 
