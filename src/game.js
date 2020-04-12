@@ -34,6 +34,7 @@ var control;
 var attackerSize = 1;
 var attackerCount = 0;
 var attackersPerLevel = 10;
+var attackerTypes = [1, 2, 3];
 
 function setSpeed(change) {
   if (change) {
@@ -110,6 +111,9 @@ function render() {
           .classed("attacker", true)
           .style("width", attackerRadius * 2)
           .style("height", attackerRadius * 2)
+          .style("background-image", function (d) {
+            return ['url("images/attacker', d.type, '.png")'].join("");
+          })
           .style("transform", function (d) {
             return [
               "translate(",
@@ -174,6 +178,7 @@ function loop(elapsed) {
 
 function createAttacker(size) {
   var y = Math.random() * (sceneHeight - 2 * attackerRadius);
+  var type = d3.shuffle(attackerTypes)[0];
   var letters = [];
   for (var i = 0; i < size; i++) {
     var charCode = getNextCharCode();
@@ -188,6 +193,7 @@ function createAttacker(size) {
     distance: steps,
     startX: 0,
     startY: y,
+    type: type,
   };
 }
 
