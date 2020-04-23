@@ -34,7 +34,11 @@ var control;
 var attackerSize = 1;
 var attackerCount = 0;
 var attackersPerLevel = 10;
-var attackerTypes = [1, 2, 3];
+var attackerTypes = [
+  { type: 1, size: 3 }, // Trex
+  { type: 2, size: 2 }, // Velo
+  { type: 3, size: 1 }, // Pter
+];
 
 function setSpeed(change) {
   if (change) {
@@ -63,7 +67,7 @@ function setDimensions() {
   distanceX = d3
     .scaleLinear()
     .domain([steps, 0])
-    .range([-attackerRadius, targetCenterX]);
+    .range([-attackerRadius, targetCenterX - 2 * attackerRadius]);
 
   distanceY = d3.scaleLinear().domain([steps, 0]);
 }
@@ -102,7 +106,7 @@ function render() {
   d3.select(".attackers")
     .selectAll(".attacker")
     .data(attackers, function (d) {
-      return d.letter;
+      return d.id;
     })
     .join(
       function (enter) {
@@ -131,9 +135,7 @@ function render() {
             return d.erased;
           })
           .style("transform", function (d) {
-            const x = d.erased
-              ? -2 * attackerRadius
-              : distanceX(d.distance) - 2 * attackerRadius;
+            const x = d.erased ? -2 * attackerRadius : distanceX(d.distance);
             const y = d.erased
               ? d.startY
               : distanceY.range([d.startY, targetCenterY - attackerRadius])(
@@ -178,7 +180,8 @@ function loop(elapsed) {
 
 function createAttacker(size) {
   var y = Math.random() * (sceneHeight - 2 * attackerRadius);
-  var type = d3.shuffle(attackerTypes)[0];
+  var typeIndex = Math.floor(Math.random() * attackerTypes.length);
+  var type = attackerTypes[typeIndex];
   var letters = [];
   for (var i = 0; i < size; i++) {
     var charCode = getNextCharCode();
@@ -188,12 +191,13 @@ function createAttacker(size) {
     });
   }
   return {
+    id: +new Date(),
     letters: letters,
     letterIndex: 0,
     distance: steps,
     startX: 0,
     startY: y,
-    type: type,
+    type: type.type,
   };
 }
 
@@ -210,6 +214,7 @@ function reset() {
   d3.select(".target").classed("hidden", true);
   attackers = [];
   attackerSize = 1;
+  attackerCount = 0;
   render();
 }
 
